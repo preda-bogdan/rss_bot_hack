@@ -17,6 +17,10 @@ spl_autoload_register(function ( $class_name ) {
 $data = new Bot_Data( 'db' );
 $db_data = $data->get_data();
 
+$arhive = new Bot_Data( 'history' );
+$history = $arhive->get_data();
+
+
 $bot_curl = new Bot_Curl( 'https://profiles.wordpress.org/themeisle/' );
 
 echo 'HTTP Status: ' . $bot_curl->get_http_code() . PHP_EOL;
@@ -26,7 +30,6 @@ $themes =  $bot_curl->get_themes_list();
 
 $plugins_data = array();
 $themes_data = array();
-$history = array();
 foreach ( $plugins as $plugin ) {
     $topics_support =  $bot_curl->xml_feed( $plugin['support'] );
     $topics_reviews =  $bot_curl->xml_feed( $plugin['reviews'] );
