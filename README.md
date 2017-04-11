@@ -21,5 +21,15 @@ Project will need to be on git, have a readme with a step by step tutorial on ho
 
 The code will need to be properly documented, each function/class will need to have valid docs.
 
+## Prerequsites
+
+- LAMP Stack (PHP 7.*)
+
+## Running
+```
+php bot.php
+```
+or via browser `//server_ip/path/to/bot.php`
+
 ### Author
 Bogdan Preda -- @bogdan.preda -- bogdan.preda@themeisle.com

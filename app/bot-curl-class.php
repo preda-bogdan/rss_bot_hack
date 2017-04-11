@@ -36,6 +36,14 @@ class Bot_Curl {
         return $url;
     }
 
+    /**
+     * Utility method to extract slug name from url.
+     *
+     * @since   1.0.0
+     * @access  private
+     * @param   string  $url
+     * @return mixed
+     */
     private function extract_slug( $url ) {
         $url = rtrim( $url, '/' );
         $parts = explode('/', $url);
@@ -43,6 +51,13 @@ class Bot_Curl {
         return $slug;
     }
 
+    /**
+     * Method to crawl page for plugins.
+     *
+     * @since   1.0.0
+     * @access  public
+     * @return array
+     */
     public function get_plugin_list() {
         $html = $this->get_html();
 
@@ -63,6 +78,13 @@ class Bot_Curl {
         return $links_map;
     }
 
+    /**
+     * Method to crawl page for themes.
+     *
+     * @since   1.0.0
+     * @access  public
+     * @return array
+     */
     public function get_themes_list() {
         $html = $this->get_html();
 
@@ -83,6 +105,14 @@ class Bot_Curl {
         return $links_map;
     }
 
+    /**
+     * Utility method to extract data from a xml feed for WP.org
+     *
+     * @since   1.0.0
+     * @access  public
+     * @param   string  $url The url to extract xml from.
+     * @return array
+     */
     public function xml_feed( $url ) {
         $rss = simplexml_load_file( $url . 'feed', 'SimpleXMLElement', LIBXML_NOCDATA );
         $topics = array();
@@ -101,6 +131,13 @@ class Bot_Curl {
         return $topics;
     }
 
+    /**
+     * Utility method to check Http Code of URL
+     *
+     * @since   1.0.0
+     * @access  public
+     * @return mixed
+     */
     public function get_http_code() {
         $ch = curl_init( $this->url );
         curl_setopt($ch, CURLOPT_HEADER, true);    // we want headers
