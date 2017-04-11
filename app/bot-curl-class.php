@@ -5,7 +5,13 @@ class Bot_Curl {
     private $url;
 
     public function __construct( $url ) {
+        require_once 'vendors/simple-html-dom.php';
         $this->url = $url;
+    }
+
+    public function get_html() {
+        $html = file_get_html( $this->url );
+        return $html;
     }
 
     public function get_http_code() {

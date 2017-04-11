@@ -8,3 +8,5 @@ spl_autoload_register(function ( $class_name ) {
 $bot_curl = new Bot_Curl( 'https://profiles.wordpress.org/themeisle/' );
 
 echo 'HTTP Status: ' . $bot_curl->get_http_code() . PHP_EOL;
+
+var_dump( $bot_curl->get_html() );
