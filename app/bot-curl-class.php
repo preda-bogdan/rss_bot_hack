@@ -1,14 +1,29 @@
 <?php
+/**
+ * The RSS Bot Hackaton
+ * Checks for new tickets and reviews on WP.org
+ *
+ * @author  Bogdan Preda
+ * @version 1.0.0
+ * @package rss_bot_hack
+ */
 
 class Bot_Curl {
 
+    /**
+     * The url to crawl.
+     *
+     * @since   1.0.0
+     * @access  private
+     * @var     string $url
+     */
     private $url;
 
     public function __construct( $url ) {
         require_once 'vendors/simple-html-dom.php';
         $this->url = $url;
     }
-
+    
     protected function get_html() {
         $html = file_get_html( $this->url );
         return $html;
@@ -38,6 +53,7 @@ class Bot_Curl {
                 $url = $this->strip_url_protocol( $elem->href );
                 $slug = $this->extract_slug( $url );
                 $links_map[] = array(
+                            'slug' => $slug,
                             'support' => 'https://wordpress.org/support/plugin/' . $slug . '/',
                             'reviews' => 'https://wordpress.org/support/plugin/' . $slug . '/reviews/'
                 );
@@ -57,6 +73,7 @@ class Bot_Curl {
                 $url = $this->strip_url_protocol( $elem->href );
                 $slug = $this->extract_slug( $url );
                 $links_map[] = array(
+                            'slug' => $slug,
                             'support' => 'https://wordpress.org/support/theme/' . $slug . '/',
                             'reviews' => 'https://wordpress.org/support/theme/' . $slug . '/reviews/'
                 );
@@ -64,6 +81,24 @@ class Bot_Curl {
         }
 
         return $links_map;
+    }
+
+    public function xml_feed( $url ) {
+        $rss = simplexml_load_file( $url . 'feed', 'SimpleXMLElement', LIBXML_NOCDATA );
+        $topics = array();
+        foreach ( $rss->channel->item as $item ) {
+            $item_to_array = json_decode( json_encode( $item ), true );
+
+            $html = str_get_html( $item_to_array['description'] );
+            $replies = $html->find('p')[0];
+
+            $topics[] = array(
+                'link' => $item_to_array['link'],
+                'date' => $item_to_array['pubDate'],
+                'replies' => str_replace( 'Replies: ', '', $replies->plaintext)
+            );
+        }
+        return $topics;
     }
 
     public function get_http_code() {
