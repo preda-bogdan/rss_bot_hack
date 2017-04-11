@@ -26,6 +26,7 @@ $themes =  $bot_curl->get_themes_list();
 
 $plugins_data = array();
 $themes_data = array();
+$history = array();
 foreach ( $plugins as $plugin ) {
     $topics_support =  $bot_curl->xml_feed( $plugin['support'] );
     $topics_reviews =  $bot_curl->xml_feed( $plugin['reviews'] );
@@ -36,6 +37,25 @@ foreach ( $plugins as $plugin ) {
         $diff = sizeof( $topics_support );
     }
 
+    if ( isset( $history['plugins'][ $plugin['slug'] ] ) ) {
+        $next = sizeof( $history['plugins'][ $plugin['slug'] ] );
+    } else {
+        $next = 0;
+    }
+    $replies_total = 0;
+    foreach ( $topics_support as $tmp ) {
+        $replies_total += $tmp['replies'];
+    }
+
+    $replies_total_rev = 0;
+    foreach ( $topics_reviews as $tmp ) {
+        $replies_total_rev += $tmp['replies'];
+    }
+
+    $history['plugins'][ $plugin['slug'] ][$next]['support']['total'] = sizeof( $topics_support );
+    $history['plugins'][ $plugin['slug'] ][$next]['support']['replies'] = $replies_total;
+    $history['plugins'][ $plugin['slug'] ][$next]['reviews']['total'] = sizeof( $topics_reviews );
+    $history['plugins'][ $plugin['slug'] ][$next]['reviews']['replies'] = $replies_total;
     $plugins_data[ $plugin['slug'] ] = array(
         'support' => array( 'count' => sizeof( $topics_support ), 'data' => $topics_support ),
         'reviews' => array( 'count' => sizeof( $topics_reviews ), 'data' => $topics_reviews ),
@@ -45,6 +65,32 @@ foreach ( $plugins as $plugin ) {
 foreach ( $themes as $theme ) {
     $topics_support =  $bot_curl->xml_feed( $theme['support'] );
     $topics_reviews =  $bot_curl->xml_feed( $theme['reviews'] );
+
+    if( isset( $db_data['themes'][ $theme['slug'] ]['count'] ) ) {
+        $diff = $db_data['themes'][ $theme['slug'] ]['count'] - sizeof( $topics_support );
+    } else {
+        $diff = sizeof( $topics_support );
+    }
+
+    if ( isset( $history['themes'][ $theme['slug'] ] ) ) {
+        $next = sizeof( $history['themes'][ $theme['slug'] ] );
+    } else {
+        $next = 0;
+    }
+    $replies_total = 0;
+    foreach ( $topics_support as $tmp ) {
+        $replies_total += $tmp['replies'];
+    }
+
+    $replies_total_rev = 0;
+    foreach ( $topics_reviews as $tmp ) {
+        $replies_total_rev += $tmp['replies'];
+    }
+
+    $history['themes'][ $theme['slug'] ][$next]['support']['total'] = sizeof( $topics_support );
+    $history['themes'][ $theme['slug'] ][$next]['support']['replies'] = $replies_total;
+    $history['themes'][ $theme['slug'] ][$next]['reviews']['total'] = sizeof( $topics_reviews );
+    $history['themes'][ $theme['slug'] ][$next]['reviews']['replies'] = $replies_total;
     $themes_data[ $theme['slug'] ] = array(
         'support' => array( 'count' => sizeof( $topics_support ), 'data' => $topics_support ),
         'reviews' => array( 'count' => sizeof( $topics_reviews ), 'data' => $topics_reviews ),
@@ -59,6 +105,6 @@ $save = array(
 $data = new Bot_Data( 'db' );
 $data->store_data( $save );
 
-//$data = new Bot_Data( 'history' );
-//$data->store_data( $history );
+$data = new Bot_Data( 'history' );
+$data->store_data( $history );
 

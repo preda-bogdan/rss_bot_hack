@@ -23,7 +23,7 @@ class Bot_Curl {
         require_once 'vendors/simple-html-dom.php';
         $this->url = $url;
     }
-    
+
     protected function get_html() {
         $html = file_get_html( $this->url );
         return $html;
