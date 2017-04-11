@@ -9,9 +9,61 @@ class Bot_Curl {
         $this->url = $url;
     }
 
-    public function get_html() {
+    protected function get_html() {
         $html = file_get_html( $this->url );
         return $html;
+    }
+
+    private function strip_url_protocol( $url ) {
+        $url = str_replace('http://', '', $url );
+        $url = str_replace('https://', '', $url );
+        $url = str_replace('//', '', $url );
+        return $url;
+    }
+
+    private function extract_slug( $url ) {
+        $url = rtrim( $url, '/' );
+        $parts = explode('/', $url);
+        $slug = $parts[ sizeof($parts) - 1 ];
+        return $slug;
+    }
+
+    public function get_plugin_list() {
+        $html = $this->get_html();
+
+        $elements = $html->find('#content-plugins ul li div h3 a');
+        $links_map = array();
+        foreach ( $elements as $elem ) {
+            if( isset( $elem->href ) ) {
+                $url = $this->strip_url_protocol( $elem->href );
+                $slug = $this->extract_slug( $url );
+                $links_map[] = array(
+                            'support' => 'https://wordpress.org/support/plugin/' . $slug . '/',
+                            'reviews' => 'https://wordpress.org/support/plugin/' . $slug . '/reviews/'
+                );
+            }
+        }
+
+        return $links_map;
+    }
+
+    public function get_themes_list() {
+        $html = $this->get_html();
+
+        $elements = $html->find('#content-themes ul li h3 a');
+        $links_map = array();
+        foreach ( $elements as $elem ) {
+            if( isset( $elem->href ) ) {
+                $url = $this->strip_url_protocol( $elem->href );
+                $slug = $this->extract_slug( $url );
+                $links_map[] = array(
+                            'support' => 'https://wordpress.org/support/theme/' . $slug . '/',
+                            'reviews' => 'https://wordpress.org/support/theme/' . $slug . '/reviews/'
+                );
+            }
+        }
+
+        return $links_map;
     }
 
     public function get_http_code() {
